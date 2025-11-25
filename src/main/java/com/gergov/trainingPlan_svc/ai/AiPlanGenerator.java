@@ -1,12 +1,16 @@
 package com.gergov.trainingPlan_svc.ai;
 
 import com.gergov.trainingPlan_svc.plan.model.PlanLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AiPlanGenerator {
 
+    private static final Logger log = LoggerFactory.getLogger(AiPlanGenerator.class);
     private final ChatClient chatClient;
 
     public AiPlanGenerator(ChatClient chatClient) {
@@ -14,14 +18,27 @@ public class AiPlanGenerator {
     }
 
     public String generatePlan(double distanceKm, int daysPerWeek, PlanLevel planLevel) {
+        try {
+            String prompt = buildPrompt(distanceKm, daysPerWeek, planLevel);
 
-        String prompt = buildPrompt(distanceKm, daysPerWeek, planLevel);
+            log.info("Generating AI plan for distance: {}km, days: {}, level: {}",
+                    distanceKm, daysPerWeek, planLevel);
 
-        // SPRING AI 1.0 VALID API
-        return chatClient.prompt()
-                .user(prompt)
-                .call()
-                .content();
+            ChatResponse response = chatClient.prompt()
+                    .user(prompt)
+                    .call().chatResponse();
+
+            assert response != null;
+            String text = response.getResult().getOutput().getText();
+
+
+            log.debug("AI plan generated successfully");
+            return text;
+
+        } catch (Exception e) {
+            log.error("Failed to generate AI plan", e);
+            throw new RuntimeException("AI service error: " + e.getMessage(), e);
+        }
     }
 
     private String buildPrompt(double distanceKm, int daysPerWeek, PlanLevel planLevel) {

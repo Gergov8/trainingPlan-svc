@@ -1,40 +1,65 @@
-package com.gergov.trainingPlan_svc.plan.service;
+    package com.gergov.trainingPlan_svc.plan.service;
 
-import com.gergov.trainingPlan_svc.ai.AiPlanGenerator;
-import com.gergov.trainingPlan_svc.plan.model.Plan;
-import com.gergov.trainingPlan_svc.plan.repository.PlanRepository;
-import com.gergov.trainingPlan_svc.web.dto.CreatePlanRequest;
-import org.springframework.stereotype.Service;
+    import com.gergov.trainingPlan_svc.ai.AiPlanGenerator;
+    import com.gergov.trainingPlan_svc.plan.model.Plan;
+    import com.gergov.trainingPlan_svc.plan.model.PlanLevel;
+    import com.gergov.trainingPlan_svc.plan.repository.PlanRepository;
+    import com.gergov.trainingPlan_svc.web.dto.CreatePlanRequest;
+    import com.gergov.trainingPlan_svc.web.dto.CreatePlanResponse;
+    import org.springframework.ai.retry.NonTransientAiException;
+    import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.util.Optional;
-import java.util.UUID;
+    import java.time.LocalDate;
+    import java.util.List;
+    import java.util.Optional;
+    import java.util.UUID;
 
-@Service
-public class PlanService {
-    private final PlanRepository repository;
-    private final AiPlanGenerator aiGenerator;
+    @Service
+    public class PlanService {
+        private final PlanRepository repository;
+        private final AiPlanGenerator aiGenerator;
 
-    public PlanService(PlanRepository repository, AiPlanGenerator aiGenerator) {
-        this.repository = repository;
-        this.aiGenerator = aiGenerator;
-    }
+        public PlanService(PlanRepository repository, AiPlanGenerator aiGenerator) {
+            this.repository = repository;
+            this.aiGenerator = aiGenerator;
+        }
 
-    public Plan createPlan(CreatePlanRequest request) {
-        String planJson = aiGenerator.generatePlan(request.distanceKm(), request.daysPerWeek(), request.planLevel());
-        Plan plan = new Plan(request.userId(), request.distanceKm(), request.daysPerWeek(), request.planLevel(), LocalDate.now(), LocalDate.now(), planJson);
-        return repository.save(plan);
-    }
 
-    public Plan regeneratePlan(UUID id, CreatePlanRequest req) {
-        Plan existing = repository.findById(id).orElseThrow();
-        String planJson = aiGenerator.generatePlan(req.distanceKm(), req.daysPerWeek(), req.planLevel());
-        existing.setPlanJson(planJson);
-        existing.setUpdatedAt(LocalDate.now());
-        existing.setDistanceKm(req.distanceKm());
-        existing.setDaysPerWeek(req.daysPerWeek());
-        return repository.save(existing);
-    }
+        public CreatePlanResponse createPlan(CreatePlanRequest request) {
+            String planJson;
+            try {
+                planJson = aiGenerator.generatePlan(
+                        request.distanceKm(),
+                        request.daysPerWeek(),
+                        PlanLevel.valueOf(request.planLevel())
+                );
+            } catch (NonTransientAiException ex) {
+                // Log useful debugging info and rethrow a meaningful runtime exception
+                // so the client (monolith) gets clearer info instead of raw HTML 404
+                throw new RuntimeException("AI provider error while generating plan: " + ex.getMessage(), ex);
+            } catch (Exception ex) {
+                throw new RuntimeException("Unexpected error while generating plan: " + ex.getMessage(), ex);
+            }
+
+            Plan plan = Plan.builder()
+                    .userId(request.userId())
+                    .distanceKm(request.distanceKm())
+                    .daysPerWeek(request.daysPerWeek())
+                    .planLevel(PlanLevel.valueOf(request.planLevel()))
+                    .createdAt(LocalDate.now())
+                    .updatedAt(LocalDate.now())
+                    .planJson(planJson)
+                    .build();
+
+            Plan saved = repository.save(plan);
+
+            return new CreatePlanResponse(
+                    saved.getId(),
+                    plan.getUserId(),
+                    "Training plan successfully created!",
+                    saved.getPlanJson()
+            );
+        }
 
     public void deletePlan(UUID id) {
         repository.deleteById(id);
@@ -43,5 +68,21 @@ public class PlanService {
     public Optional<Plan> getPlan(UUID id) {
         return repository.findById(id);
     }
+
+        public List<Plan> getPlansByUser(UUID userId) {
+            return repository.findByUserId(userId);
+        }
+
+        public Optional<Plan> getUserPlan(UUID planId, UUID userId) {
+            return repository.findByIdAndUserId(planId, userId);
+        }
+
+        public long getUserPlanCount(UUID userId) {
+            return repository.countByUserId(userId);
+        }
+
+        public void deleteUserPlans(UUID userId) {
+            repository.deleteByUserId(userId);
+        }
 }
 

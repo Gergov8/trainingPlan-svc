@@ -18,9 +18,18 @@ public class Plan {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    // Reference to monolith user
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
+
     private Double distanceKm;
+
     private int daysPerWeek;
+
+    @Enumerated(EnumType.STRING)
     private PlanLevel planLevel;
+
     private LocalDate createdAt;
     private LocalDate updatedAt;
 
