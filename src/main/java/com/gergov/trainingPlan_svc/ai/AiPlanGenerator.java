@@ -57,8 +57,9 @@ public class AiPlanGenerator {
         - Training days per week: %s
         - Level: %s
         - Weekly mileage, pace and hard sessions should be considered with the level of the user
-        - Output *ONLY VALID JSON* in this exact schema:
         - If training days per week equal 7 then schedule 1 recovery run(very easy pace and relatively short)
+        - Trainings should EQUAL the days per week
+        - Output *ONLY VALID JSON* in this exact schema:
 
         {
           "distanceKm": number,
