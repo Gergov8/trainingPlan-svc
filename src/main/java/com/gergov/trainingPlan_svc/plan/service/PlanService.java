@@ -34,8 +34,6 @@
                         PlanLevel.valueOf(request.planLevel())
                 );
             } catch (NonTransientAiException ex) {
-                // Log useful debugging info and rethrow a meaningful runtime exception
-                // so the client (monolith) gets clearer info instead of raw HTML 404
                 throw new RuntimeException("AI provider error while generating plan: " + ex.getMessage(), ex);
             } catch (Exception ex) {
                 throw new RuntimeException("Unexpected error while generating plan: " + ex.getMessage(), ex);

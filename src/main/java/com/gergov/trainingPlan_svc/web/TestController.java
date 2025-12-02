@@ -17,10 +17,4 @@ public class TestController {
         log.info("Test hello endpoint called");
         return "Test Hello from Microservice!";
     }
-
-    @GetMapping("/ping")
-    public String ping() {
-        log.info("Ping endpoint called");
-        return "PONG";
-    }
 }
