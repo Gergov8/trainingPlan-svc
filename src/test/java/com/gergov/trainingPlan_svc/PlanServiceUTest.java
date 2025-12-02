@@ -41,7 +41,7 @@ class PlanServiceUTest {
     }
 
     @Test
-    void createPlan_ShouldReturnCreatedPlan() throws Exception {
+    void createPlan_ShouldReturnCreatedPlan() {
         CreatePlanRequest request = new CreatePlanRequest(
                 userId,
                 10.0,
@@ -78,7 +78,7 @@ class PlanServiceUTest {
     }
 
     @Test
-    void createPlan_ShouldThrow_WhenAiFails() throws Exception {
+    void createPlan_ShouldThrow_WhenAiFails() {
         CreatePlanRequest request = new CreatePlanRequest(
                 userId,
                 10.0,
