@@ -78,9 +78,5 @@
         public long getUserPlanCount(UUID userId) {
             return repository.countByUserId(userId);
         }
-
-        public void deleteUserPlans(UUID userId) {
-            repository.deleteByUserId(userId);
-        }
-}
+    }
 

@@ -10,11 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/test")
 public class TestController {
 
-    private static final Logger log = LoggerFactory.getLogger(TestController.class);
-
     @GetMapping("/hello")
     public String hello() {
-        log.info("Test hello endpoint called");
         return "Test Hello from Microservice!";
     }
 }
