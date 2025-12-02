@@ -14,10 +14,12 @@ public class AiConfig {
 
     @Bean
     public ChatClient chatClient(OpenAiChatModel chatModel) {
+
         if (chatModel == null) {
             log.error("OpenAiChatModel bean is null - check spring.ai.openai.model property");
             throw new IllegalStateException("OpenAiChatModel bean is not configured");
         }
+
         return ChatClient.builder(chatModel).build();
     }
 }

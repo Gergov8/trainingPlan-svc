@@ -14,6 +14,7 @@ public class AiPlanGenerator {
     private final ChatClient chatClient;
 
     public AiPlanGenerator(ChatClient chatClient) {
+
         this.chatClient = chatClient;
     }
 

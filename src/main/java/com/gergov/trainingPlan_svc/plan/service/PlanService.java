@@ -26,7 +26,9 @@
 
 
         public CreatePlanResponse createPlan(CreatePlanRequest request) {
+
             String planJson;
+
             try {
                 planJson = aiGenerator.generatePlan(
                         request.distanceKm(),
@@ -59,13 +61,13 @@
             );
         }
 
-    public void deletePlan(UUID id) {
-        repository.deleteById(id);
-    }
+        public void deletePlan(UUID id) {
+                repository.deleteById(id);
+        }
 
-    public Optional<Plan> getPlan(UUID id) {
-        return repository.findById(id);
-    }
+        public Optional<Plan> getPlan(UUID id) {
+                return repository.findById(id);
+        }
 
         public List<Plan> getPlansByUser(UUID userId) {
             return repository.findByUserId(userId);

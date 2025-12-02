@@ -26,12 +26,15 @@ public class PlanController {
 
     @PostMapping
     public ResponseEntity<CreatePlanResponse> createPlan(@RequestBody CreatePlanRequest request) {
+
         CreatePlanResponse response = planService.createPlan(request);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Plan> getPlan(@PathVariable UUID id) {
+
         Plan plan = planService.getPlan(id).orElse(null);
         if (plan == null) return ResponseEntity.notFound().build();
 
@@ -41,31 +44,36 @@ public class PlanController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
+
         planService.deletePlan(id);
+
         return ResponseEntity.noContent().build();
     }
 
-    // Get all plans for a user
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Plan>> getUserPlans(@PathVariable UUID userId) {
+
         List<Plan> plans = planService.getPlansByUser(userId);
+
         return ResponseEntity.ok(plans);
     }
 
-    // Get specific user's plan
     @GetMapping("/user/{userId}/plan/{planId}")
     public ResponseEntity<Plan> getUserPlan(
             @PathVariable UUID userId,
             @PathVariable UUID planId) {
+
         Optional<Plan> plan = planService.getUserPlan(planId, userId);
+
         return plan.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Get user's plan count
     @GetMapping("/user/{userId}/count")
     public ResponseEntity<Long> getUserPlanCount(@PathVariable UUID userId) {
+
         long count = planService.getUserPlanCount(userId);
+
         return ResponseEntity.ok(count);
     }
 

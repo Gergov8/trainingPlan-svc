@@ -32,7 +32,6 @@ class TestControllerApiTest {
         long endTime = System.currentTimeMillis();
         long responseTime = endTime - startTime;
 
-        // Assert that response time is reasonable (less than 1 second)
         assert responseTime < 1000 : "Response took too long: " + responseTime + "ms";
     }
 }

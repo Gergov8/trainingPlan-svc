@@ -40,17 +40,14 @@ public class CreatePlanITest {
                 5
         );
 
-        // Create plan
         CreatePlanResponse response = planService.createPlan(request);
 
-        // Verify response
         assertNotNull(response);
         assertEquals(userId, response.userId());
         assertNotNull(response.planId());
         assertEquals("Training plan successfully created!", response.summary());
         assertNotNull(response.planJson());
 
-        // Verify that plan exists in repository
         Optional<Plan> planFromDb = planRepository.findById(response.planId());
         assertTrue(planFromDb.isPresent());
         Plan plan = planFromDb.get();
@@ -65,7 +62,6 @@ public class CreatePlanITest {
     void getPlansByUser_ShouldReturnListOfPlans() {
         UUID userId = UUID.randomUUID();
 
-        // Create multiple plans
         planService.createPlan(new CreatePlanRequest(userId, 5.0, "RECREATIONAL", 4));
         planService.createPlan(new CreatePlanRequest(userId, 8.0, "COMPETITIVE", 6));
 

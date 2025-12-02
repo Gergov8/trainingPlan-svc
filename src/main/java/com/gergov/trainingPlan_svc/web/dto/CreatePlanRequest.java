@@ -5,6 +5,6 @@ import java.util.UUID;
 public record CreatePlanRequest(
         UUID userId,
         Double distanceKm,
-        String planLevel,  // Changed from PlanLevel to String
+        String planLevel,
         int daysPerWeek
 ) {}
